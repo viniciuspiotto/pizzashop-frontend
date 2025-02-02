@@ -1,4 +1,5 @@
 import { useForm } from "react-hook-form";
+import { Link } from "react-router-dom";
 import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
@@ -29,6 +30,10 @@ function SignIn() {
 
   return (
     <div className="p-8">
+      <Button asChild className="absolute right-8 top-8" variant={"ghost"}>
+        <Link to="/sign-up">Novo estabelecimento</Link>
+      </Button>
+
       <div className="flex w-[320px] flex-col justify-center gap-6">
         <div className="flex flex-col gap-2 text-center">
           <h1 className="text-2xl font-semibold tracking-tight">
@@ -39,7 +44,7 @@ function SignIn() {
           </p>
         </div>
         <form className="space-y-4" onSubmit={handleSubmit(handleSignIn)}>
-          <div className="space-y-4">
+          <div className="space-y-1">
             <Label htmlFor="email">Seu e-mail</Label>
             <Input id="email" type="email" {...register("email")} />
           </div>
@@ -57,7 +62,7 @@ function SignIn() {
               });
             }}
           >
-            Submit
+            Acessar
           </Button>
         </form>
       </div>
