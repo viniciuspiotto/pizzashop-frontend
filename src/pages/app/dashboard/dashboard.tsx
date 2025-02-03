@@ -1,4 +1,5 @@
 import DayOrdersAmountCard from "./dayOrdersAmountCard";
+import FavoriteProductPieChart from "./favoriteProductPieChart";
 import MonthCanceledOrdersAmountCard from "./monthCanceledOrdersAmountCard";
 import MonthOrdersAmountCard from "./monthOrdersAmountCard";
 import MonthRevenueCard from "./monthRevenueCard";
@@ -16,6 +17,7 @@ function Dashboard() {
       </div>
       <div className="grid grid-cols-8 gap-4">
         <RevenueChart />
+        <FavoriteProductPieChart />
       </div>
     </div>
   );

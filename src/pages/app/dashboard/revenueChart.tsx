@@ -34,11 +34,9 @@ const chartConfig = {
 function RevenueChart() {
   return (
     <Card className="col-span-4">
-      <CardHeader>
-        <CardTitle className="text-base font-medium">
-          Receita no periodo de 7 dias
-        </CardTitle>
-        <CardDescription>Receita diaria do periodo</CardDescription>
+      <CardHeader className="flex flex-col items-center">
+        <CardTitle className="text-base font-medium">Receita semanal</CardTitle>
+        <CardDescription>10/12 - 16/12</CardDescription>
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig}>
