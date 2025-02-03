@@ -1,7 +1,9 @@
+import { useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 import { z } from "zod";
 
+import { registerRestaurant } from "@/api/registerRestaurant";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -18,6 +20,10 @@ const signUpForm = z.object({
 type SignUpForm = z.infer<typeof signUpForm>;
 
 function SignUp() {
+  const { mutateAsync: registerRestaurantFn } = useMutation({
+    mutationFn: registerRestaurant,
+  });
+
   const {
     register,
     handleSubmit,
@@ -25,8 +31,33 @@ function SignUp() {
   } = useForm<SignUpForm>();
 
   async function handleSignUp(data: SignUpForm) {
-    console.log(data);
-    await new Promise((resolve) => setTimeout(resolve, 2000));
+    try {
+      await registerRestaurantFn({
+        restaurantName: data.restaurantName,
+        managerName: data.managerName,
+        email: data.email,
+        phone: data.phone,
+      });
+
+      toast({
+        variant: "success",
+        description: "Restaurante cadastrado com sucesso!",
+        action: (
+          <ToastAction
+            altText="Acessar link"
+            onClick={() => navigate(`/sign-in?email=${data.email}`)}
+          >
+            Fazer Login
+          </ToastAction>
+        ),
+      });
+    } catch {
+      toast({
+        variant: "destructive",
+        title: "Falha ao tentar cadastro",
+        description: "Ocorreu um erro ao tentar cadastrar seu estabelecimento.",
+      });
+    }
   }
 
   const { toast } = useToast();
@@ -68,24 +99,7 @@ function SignUp() {
             <Label htmlFor="phone">Seu celular</Label>
             <Input id="phone" type="tel" {...register("phone")} />
           </div>
-          <Button
-            className="w-full"
-            disabled={isSubmitting}
-            onClick={() => {
-              toast({
-                variant: "success",
-                description: "Restaurante cadastrado com sucesso!",
-                action: (
-                  <ToastAction
-                    altText="Acessar link"
-                    onClick={() => navigate("/sign-in")}
-                  >
-                    Fazer Login
-                  </ToastAction>
-                ),
-              });
-            }}
-          >
+          <Button className="w-full" disabled={isSubmitting}>
             Finalizar cadastro
           </Button>
         </form>

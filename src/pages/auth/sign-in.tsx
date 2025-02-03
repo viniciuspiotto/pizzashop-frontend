@@ -1,7 +1,9 @@
+import { useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { z } from "zod";
 
+import { signIn } from "@/api/signIn";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -15,18 +17,40 @@ const signInForm = z.object({
 type SignInForm = z.infer<typeof signInForm>;
 
 function SignIn() {
+  const [searchParams] = useSearchParams();
+
+  const { mutateAsync: authenticate } = useMutation({
+    mutationFn: signIn,
+  });
+
   const {
     register,
     handleSubmit,
     formState: { isSubmitting },
-  } = useForm<SignInForm>();
-
-  async function handleSignIn(data: SignInForm) {
-    console.log(data);
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-  }
+  } = useForm<SignInForm>({
+    defaultValues: { email: searchParams.get("email") ?? "" },
+  });
 
   const { toast } = useToast();
+
+  async function handleSignIn(data: SignInForm) {
+    try {
+      await authenticate({ email: data.email });
+
+      toast({
+        variant: "success",
+        description: "Enviamos um link de autenticacao para seu e-mail.",
+        action: <ToastAction altText="Acessar link">Acessar</ToastAction>,
+      });
+    } catch {
+      toast({
+        variant: "destructive",
+        title: "Falha na requisicao",
+        description:
+          "Ocorreu um erro ao tentar autenticar, verifique seu e-mail.",
+      });
+    }
+  }
 
   return (
     <div className="p-8">
@@ -48,20 +72,7 @@ function SignIn() {
             <Label htmlFor="email">Seu e-mail</Label>
             <Input id="email" type="email" {...register("email")} />
           </div>
-          <Button
-            className="w-full"
-            disabled={isSubmitting}
-            onClick={() => {
-              toast({
-                variant: "success",
-                description:
-                  "Enviamos um link de autenticacao para seu e-mail.",
-                action: (
-                  <ToastAction altText="Acessar link">Acessar</ToastAction>
-                ),
-              });
-            }}
-          >
+          <Button className="w-full" disabled={isSubmitting}>
             Acessar
           </Button>
         </form>
