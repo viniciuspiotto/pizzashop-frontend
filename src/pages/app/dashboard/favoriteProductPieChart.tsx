@@ -1,6 +1,8 @@
+import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 import { Label, Pie, PieChart } from "recharts";
 
+import { getPopularProducts } from "@/api/getPopularProducts";
 import {
   Card,
   CardContent,
@@ -10,9 +12,9 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import {
-  ChartConfig,
   ChartContainer,
   ChartTooltip,
+  ChartTooltipContent,
 } from "@/components/ui/chart";
 import {
   Table,
@@ -23,53 +25,22 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-
-const chartData = [
-  { type: "calabresa", amount: 23, fill: "var(--color-pepperoni)" },
-  { type: "portuguesa", amount: 18, fill: "var(--color-portuguese)" },
-  { type: "marguerita", amount: 18, fill: "var(--color-margherita)" },
-  {
-    type: "frango com catupiry",
-    amount: 16,
-    fill: "var(--color-chickenCatupiry)",
-  },
-  {
-    type: "banana com canela",
-    amount: 12,
-    fill: "var(--color-bananaCinnamon)",
-  },
-];
-
-const chartConfig = {
-  pizzas: {
-    label: "Pizzas vendidas",
-  },
-  pepperoni: {
-    label: "Portuguesa",
-    color: "hsl(var(--chart-1))",
-  },
-  portuguese: {
-    label: "Marguerita",
-    color: "hsl(var(--chart-2))",
-  },
-  margherita: {
-    label: "Frango com Catupiry",
-    color: "hsl(var(--chart-3))",
-  },
-  chickenCatupiry: {
-    label: "banana com canela",
-    color: "hsl(var(--chart-4))",
-  },
-  bananaCinnamon: {
-    label: "Other",
-    color: "hsl(var(--chart-5))",
-  },
-} satisfies ChartConfig;
+import { prepareChart } from "@/utils/prepareChart";
 
 function FavoriteProductPieChart() {
+  const { data: popularProducts } = useQuery({
+    queryKey: ["metrics", "popular-products"],
+    queryFn: getPopularProducts,
+  });
+
+  const { chartData, chartConfig } = useMemo(() => {
+    if (!popularProducts) return { chartData: [], chartConfig: {} };
+    return prepareChart(popularProducts);
+  }, [popularProducts]);
+
   const totalPizzas = useMemo(() => {
     return chartData.reduce((acc, curr) => acc + curr.amount, 0);
-  }, []);
+  }, [chartData]);
 
   return (
     <Card className="col-span-2 flex flex-col">
@@ -78,51 +49,56 @@ function FavoriteProductPieChart() {
         <CardDescription>Janeiro - Fevereiro 2025</CardDescription>
       </CardHeader>
       <CardContent className="pb-0">
-        <ChartContainer
-          config={chartConfig}
-          className="mx-auto aspect-square max-h-[300px]"
-        >
-          <PieChart>
-            <ChartTooltip />
-            <Pie
-              data={chartData}
-              dataKey={"amount"}
-              nameKey={"type"}
-              innerRadius={60}
-              strokeWidth={5}
-            >
-              <Label
-                content={({ viewBox }) => {
-                  if (viewBox && "cx" in viewBox && "cy" in viewBox) {
-                    return (
-                      <text
-                        x={viewBox.cx}
-                        y={viewBox.cy}
-                        textAnchor="middle"
-                        dominantBaseline="middle"
-                      >
-                        <tspan
+        {popularProducts && (
+          <ChartContainer
+            config={chartConfig}
+            className="mx-auto aspect-square max-h-[300px]"
+          >
+            <PieChart>
+              <ChartTooltip
+                cursor={false}
+                content={<ChartTooltipContent hideLabel className="gap-2" />}
+              />
+              <Pie
+                data={chartData}
+                dataKey="amount"
+                nameKey="type"
+                innerRadius={70}
+                strokeWidth={5}
+              >
+                <Label
+                  content={({ viewBox }) => {
+                    if (viewBox && "cx" in viewBox && "cy" in viewBox) {
+                      return (
+                        <text
                           x={viewBox.cx}
                           y={viewBox.cy}
-                          className="fill-foreground text-3xl font-bold"
+                          textAnchor="middle"
+                          dominantBaseline="middle"
                         >
-                          {totalPizzas.toLocaleString()}
-                        </tspan>
-                        <tspan
-                          x={viewBox.cx}
-                          y={(viewBox.cy || 0) + 24}
-                          className="fill-muted-foreground"
-                        >
-                          Pizzas
-                        </tspan>
-                      </text>
-                    );
-                  }
-                }}
-              />
-            </Pie>
-          </PieChart>
-        </ChartContainer>
+                          <tspan
+                            x={viewBox.cx}
+                            y={(viewBox.cy || 0) - 5}
+                            className="fill-foreground text-3xl font-bold"
+                          >
+                            {totalPizzas.toLocaleString()}
+                          </tspan>
+                          <tspan
+                            x={viewBox.cx}
+                            y={(viewBox.cy || 0) + 25}
+                            className="fill-muted-foreground text-lg"
+                          >
+                            Pizzas
+                          </tspan>
+                        </text>
+                      );
+                    }
+                  }}
+                />
+              </Pie>
+            </PieChart>
+          </ChartContainer>
+        )}
       </CardContent>
       <CardFooter>
         <Table>
