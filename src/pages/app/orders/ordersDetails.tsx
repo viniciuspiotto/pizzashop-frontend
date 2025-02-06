@@ -20,6 +20,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
+import OrderDetailsSkeleton from "./orderDetailsSkeleton";
+
 interface OrderDetailsProps {
   orderId: string;
   open: boolean;
@@ -38,7 +40,7 @@ function OrdersDetails({ orderId, open }: OrderDetailsProps) {
         <DialogTitle>Pedido: {orderId}</DialogTitle>
         <DialogDescription>Detalhes do pedido</DialogDescription>
       </DialogHeader>
-      {order && (
+      {order ? (
         <div className="space-y-6">
           <Table>
             <TableBody>
@@ -56,18 +58,16 @@ function OrdersDetails({ orderId, open }: OrderDetailsProps) {
                   </div>
                 </TableCell>
               </TableRow>
-              {order.customer.phone && (
-                <TableRow>
-                  <TableCell className="text-muted-foreground">
-                    Telefone
-                  </TableCell>
-                  <TableCell className="flex justify-end">
-                    <div className="flex items-center gap-2">
-                      {order.customer.phone}
-                    </div>
-                  </TableCell>
-                </TableRow>
-              )}
+              <TableRow>
+                <TableCell className="text-muted-foreground">
+                  Telefone
+                </TableCell>
+                <TableCell className="flex justify-end">
+                  <div className="flex items-center gap-2">
+                    {order.customer.phone ?? "Não informado"}
+                  </div>
+                </TableCell>
+              </TableRow>
               <TableRow>
                 <TableCell className="text-muted-foreground">Email</TableCell>
                 <TableCell className="flex justify-end">
@@ -141,6 +141,8 @@ function OrdersDetails({ orderId, open }: OrderDetailsProps) {
             </TableFooter>
           </Table>
         </div>
+      ) : (
+        <OrderDetailsSkeleton />
       )}
     </DialogContent>
   );
