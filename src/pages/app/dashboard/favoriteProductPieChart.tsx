@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { Loader2 } from "lucide-react";
 import { useMemo } from "react";
 import { Label, Pie, PieChart } from "recharts";
 
@@ -49,7 +50,7 @@ function FavoriteProductPieChart() {
         <CardDescription>Janeiro - Fevereiro 2025</CardDescription>
       </CardHeader>
       <CardContent className="pb-0">
-        {popularProducts && (
+        {popularProducts ? (
           <ChartContainer
             config={chartConfig}
             className="mx-auto aspect-square max-h-[300px]"
@@ -98,6 +99,10 @@ function FavoriteProductPieChart() {
               </Pie>
             </PieChart>
           </ChartContainer>
+        ) : (
+          <div className="flex h-[300px] w-full items-center justify-center">
+            <Loader2 className="size-8 animate-spin text-muted-foreground" />
+          </div>
         )}
       </CardContent>
       <CardFooter>

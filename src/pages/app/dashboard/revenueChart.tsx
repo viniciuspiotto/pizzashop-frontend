@@ -4,13 +4,7 @@ import { DateRange } from "react-day-picker";
 import { CartesianGrid, Line, LineChart, XAxis } from "recharts";
 
 import { getDailyRevenueInPeriod } from "@/api/getDailyRevenueInPeriod";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   ChartConfig,
   ChartContainer,
@@ -27,6 +21,7 @@ const chartConfig = {
 } satisfies ChartConfig;
 
 import { subDays } from "date-fns";
+import { Loader2 } from "lucide-react";
 
 function RevenueChart() {
   const [dateRange, setDateRange] = useState<DateRange | undefined>({
@@ -62,7 +57,7 @@ function RevenueChart() {
         </div>
         <DatePickerWithRange date={dateRange} onDateChange={setDateRange} />
       </CardHeader>
-      {chartDate && (
+      {chartDate ? (
         <CardContent>
           <ChartContainer config={chartConfig}>
             <LineChart
@@ -105,6 +100,10 @@ function RevenueChart() {
             </LineChart>
           </ChartContainer>
         </CardContent>
+      ) : (
+        <div className="flex h-[500px] w-full items-center justify-center">
+          <Loader2 className="size-8 animate-spin text-muted-foreground" />
+        </div>
       )}
     </Card>
   );
